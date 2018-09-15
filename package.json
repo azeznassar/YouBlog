@@ -1,0 +1,15 @@
+{
+  "name": "flask_blog",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "sass": "node-sass scss/main.scss static/css/main.css"
+  },
+  "keywords": [],
+  "author": "Azez Nassar",
+  "license": "ISC",
+  "dependencies": {
+    "node-sass": "^4.9.3"
+  }
+}
