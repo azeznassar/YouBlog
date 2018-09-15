@@ -1,11 +1,10 @@
-import os
-from flask import Flask, render_template, flash, redirect, url_for
-from forms import SignUpForm, LoginForm
-app = Flask(__name__)
-app.config['SECRET_KEY'] = os.environ['SECRET_KEY']
+from flask import render_template, flash, redirect, url_for
+from src import app
+from src.forms import SignUpForm, LoginForm
+from src.models import User, Post
 
-posts = [ # list not array 
-    { # dictionary not object
+posts = [
+    {
         'author': 'Azez Nassar',
         'title': 'Blog Post 1',
         'content': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
@@ -34,7 +33,6 @@ def sign_up():
     if form.validate_on_submit():
         flash(f'Account successfully created for {form.username.data}', 'success')
         return redirect(url_for('home'))
-    
     return render_template('signup.html', title='Sign Up', form=form)
 
 @app.route("/login", methods=['GET', 'POST'])
@@ -45,9 +43,8 @@ def login():
             flash('Login successful.', 'success')
             return redirect(url_for('home'))
         else:
-            flash('Login failed. Verify that you have entered your credentials correctly.', 'danger')
+            msg = 'Login failed. Verify that you have entered your credentials correctly.'
+            flash(msg, 'danger')
 
     return render_template('login.html', title='Login', form=form)
-
-if __name__ == '__main__':
-    app.run(debug=True)
+    
