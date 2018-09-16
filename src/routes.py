@@ -2,6 +2,7 @@ import os
 import secrets
 from flask import render_template, flash, redirect, url_for, request
 from flask_login import login_user, current_user, logout_user, login_required
+from PIL import Image
 from src import app, db, bcrypt
 from src.forms import SignUpForm, LoginForm, UpdateAccountForm
 from src.models import User, Post
@@ -78,7 +79,12 @@ def update_image(selected_image):
     _, file_ext = os.path.splitext(selected_image.filename)
     image_file_name = random_string + file_ext
     image_path = os.path.join(app.root_path, 'static/profile_imgs', image_file_name)
-    selected_image.save(image_path)
+
+    output_size = (125, 125)
+    image = Image.open(selected_image)
+    image.thumbnail(output_size)
+
+    image.save(image_path)
     return image_file_name
 
 @app.route("/account", methods=['GET', 'POST'])
@@ -89,6 +95,9 @@ def account():
     if form.validate_on_submit():
         if form.image.data:
             image_file = update_image(form.image.data)
+            if current_user.image != 'default.png':
+                old_image_path = os.path.join(app.root_path, 'static/profile_imgs', current_user.image)
+                os.remove(old_image_path)
             current_user.image = image_file
 
         current_user.username = form.username.data
