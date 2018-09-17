@@ -7,25 +7,10 @@ from src import app, db, bcrypt
 from src.forms import SignUpForm, LoginForm, UpdateAccountForm, PostForm
 from src.models import User, Post
 
-posts = [
-    {
-        'author': 'Azez Nassar',
-        'title': 'Blog Post 1',
-        'content': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-        'date_posted': 'September 15, 2018'
-    },
-    {
-        'author': 'John Doe',
-        'title': 'Blog Post 2',
-        'content': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-        'date_posted': 'September 17, 2018'
-    },
-]
-
-
 @app.route("/")
 @app.route("/home")
 def home():
+    posts = Post.query.all()
     return render_template('home.html', posts=posts, title='Post and share your own blogs')
 
 
@@ -118,7 +103,15 @@ def submit_post():
     form = PostForm()
 
     if form.validate_on_submit():
+        new_post = Post(title=form.title.data, content=form.content.data, author=current_user)
+        db.session.add(new_post)
+        db.session.commit()
         flash('Your blog post has been submitted', 'success')
         return redirect(url_for('home'))
 
     return render_template('submit.html', title='Submit a post', form=form)
+
+@app.route("/post/<int:post_id>")
+def post(post_id):
+    current_post = Post.query.get_or_404(post_id)
+    return render_template('post.html', title=current_post.title, post=current_post)

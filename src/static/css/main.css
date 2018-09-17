@@ -48,3 +48,8 @@ h1, h2, h3, h4, h5, h6 {
 
 .account-heading {
   font-size: 2.5rem; }
+
+.article-img {
+  height: 65px;
+  width: 65px;
+  margin-right: 16px; }
