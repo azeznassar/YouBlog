@@ -4,7 +4,7 @@ from flask import render_template, flash, redirect, url_for, request
 from flask_login import login_user, current_user, logout_user, login_required
 from PIL import Image
 from src import app, db, bcrypt
-from src.forms import SignUpForm, LoginForm, UpdateAccountForm
+from src.forms import SignUpForm, LoginForm, UpdateAccountForm, PostForm
 from src.models import User, Post
 
 posts = [
@@ -111,3 +111,14 @@ def account():
 
     image = url_for('static', filename=f'profile_imgs/{current_user.image}')
     return render_template('account.html', title='Your Account', image=image, form=form)
+
+@app.route("/submit", methods=['GET', 'POST'])
+@login_required
+def submit_post():
+    form = PostForm()
+
+    if form.validate_on_submit():
+        flash('Your blog post has been submitted', 'success')
+        return redirect(url_for('home'))
+
+    return render_template('submit.html', title='Submit a post', form=form)
