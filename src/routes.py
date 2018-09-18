@@ -1,6 +1,6 @@
 import os
 import secrets
-from flask import render_template, flash, redirect, url_for, request
+from flask import render_template, flash, redirect, url_for, request, abort
 from flask_login import login_user, current_user, logout_user, login_required
 from PIL import Image
 from src import app, db, bcrypt
@@ -109,9 +109,46 @@ def submit_post():
         flash('Your blog post has been submitted', 'success')
         return redirect(url_for('home'))
 
-    return render_template('submit.html', title='Submit a post', form=form)
+    return render_template('submit.html', title='Submit a post', legend='Submit a blog post', form=form)
 
 @app.route("/post/<int:post_id>")
 def post(post_id):
     current_post = Post.query.get_or_404(post_id)
     return render_template('post.html', title=current_post.title, post=current_post)
+
+@app.route("/post/<int:post_id>/edit", methods=['GET', 'POST'])
+@login_required
+def edit_post(post_id):
+    current_post = Post.query.get_or_404(post_id)
+
+    if current_post.author != current_user:
+        abort(403)
+
+    form = PostForm()
+
+    if form.validate_on_submit():
+        current_post.title = form.title.data
+        current_post.content = form.content.data
+        db.session.commit()
+        flash('Your post have been updated.', 'success')
+        return redirect(url_for('post', post_id=current_post.id))
+    elif request.method == 'GET':
+        form.title.data = current_post.title
+        form.content.data = current_post.content
+
+    return render_template('submit.html', title='Edit post', legend='Edit your blog post', form=form)
+
+
+@app.route("/post/<int:post_id>/delete", methods=['POST'])
+@login_required
+def delete_post(post_id):
+    current_post = Post.query.get_or_404(post_id)
+
+    if current_post.author != current_user:
+        abort(403)
+
+    db.session.delete(current_post)
+    db.session.commit()
+    flash('Your post have been deleted.', 'success')
+    return redirect(url_for('home'))
+    
