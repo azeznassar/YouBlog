@@ -10,7 +10,12 @@ from src.models import User, Post
 @app.route("/")
 @app.route("/home")
 def home():
-    posts = Post.query.all()
+    page = request.args.get('page', 1, type=int)
+    posts = Post.query.order_by(Post.date_posted.desc()).paginate(per_page=5, page=page)
+    for p in posts.items:
+        p.content = p.content[:60] + '...'
+        p.content = " ".join(p.content.splitlines())
+
     return render_template('home.html', posts=posts, title='Post and share your own blogs')
 
 
@@ -151,4 +156,3 @@ def delete_post(post_id):
     db.session.commit()
     flash('Your post have been deleted.', 'success')
     return redirect(url_for('home'))
-    

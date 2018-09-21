@@ -1,10 +1,11 @@
 $clr_white: #fff;
-$clr_off_white: #f1f0f0;
+$clr_off_white: #eff0f1;
 $clr_grey: #444;
 $clr_grey_dark: #333;
 $clr_grey_light: #cbd5db;
-$clr_blue: #10278ae6;
-$clr_blue_light: #428bca;
+$clr_light_grey: #c1c2c7;
+$clr_blue: #3864db;
+$clr_blue_light: #007bff;
 
 
 body {
@@ -22,14 +23,14 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .site-header .navbar-nav .nav-link {
-    color: $clr_grey_light;
+    color: $clr_white;
 
     &:hover {
-		color: $clr_white;
+		color: $clr_light_grey;
     }
 
     &:active {
-    	font-weight: 500;
+		font-weight: 500;
     }
 }
 
