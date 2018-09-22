@@ -47,6 +47,11 @@ class UpdateAccountForm(FlaskForm):
                 raise ValidationError('Email already exists.')
 
 class PostForm(FlaskForm):
-    title = StringField('Title', validators=[DataRequired()])
-    content = TextAreaField('Content', validators=[DataRequired()])
+    title = StringField('Title', validators=[DataRequired(), Length(min=5)])
+    content = TextAreaField('Content', validators=[DataRequired(), Length(min=20)])
     submit = SubmitField('Submit')
+
+class ContactForm(FlaskForm):
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    message = TextAreaField('Message', validators=[DataRequired(), Length(min=15)])
+    send = SubmitField('Send')

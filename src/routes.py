@@ -4,7 +4,7 @@ from flask import render_template, flash, redirect, url_for, request, abort
 from flask_login import login_user, current_user, logout_user, login_required
 from PIL import Image
 from src import app, db, bcrypt
-from src.forms import SignUpForm, LoginForm, UpdateAccountForm, PostForm
+from src.forms import SignUpForm, LoginForm, UpdateAccountForm, PostForm, ContactForm
 from src.models import User, Post
 
 @app.route("/")
@@ -177,4 +177,17 @@ def sort_by_oldest():
         p.content = " ".join(p.content.splitlines())
 
     return render_template('posts.html', posts=posts, title='Oldest blog posts')
-    
+
+
+@app.route("/contact", methods=['GET', 'POST'])
+def contact():
+    form = ContactForm()
+
+    if form.validate_on_submit():
+        flash('Your message has been sent.', 'success')
+        return redirect(url_for('contact'))
+    elif request.method == 'GET':
+        if current_user.is_authenticated:
+            form.email.data = current_user.email
+
+    return render_template('contact.html', title='Contact', form=form)

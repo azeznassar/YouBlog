@@ -1,0 +1,48 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="content-section">
+    <div class="media">
+        <div class="media-body">
+            <h2 class="account-heading">Contact</h2>
+            <p class="text-secondary">YouBlog is a blogging platform for anyone and everybody. If you have any questions, problems or bugs, please don't hesitate to open an issue on the <a href="https://github.com/azeznassar">Github Repo</a> or send a message below.</p>
+        </div>
+    </div>
+    <form action="" method="POST" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        <fieldset class="form-group">
+            <legend class="border-bottom mb-2">Send a message</legend>
+            <div class="form-group">
+                {{ form.email.label(class="form-control-label") }}
+
+                {% if form.email.errors %}
+                    {{ form.email(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.email.errors %}
+                        <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.email(class="form-control form-control-lg") }}
+                {% endif %}
+            </div>
+            <div class="form-group">
+                    {{ form.message.label(class="form-control-label") }}
+    
+                    {% if form.message.errors %}
+                        {{ form.message(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.message.errors %}
+                            <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.message(class="form-control form-control-lg", rows='7', cols='7') }}
+                    {% endif %}
+                </div>
+        </fieldset>
+        <div class="form-group">
+            {{ form.send(class="btn btn-outline-info") }}
+        </div>
+    </form>
+</div>
+{% endblock %}
