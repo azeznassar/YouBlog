@@ -156,3 +156,15 @@ def delete_post(post_id):
     db.session.commit()
     flash('Your post have been deleted.', 'success')
     return redirect(url_for('home'))
+
+#Username in URL: remove spaces for - or disable spaces and add Display Name.
+@app.route("/user/<string:username>")
+def user_profile(username):
+    page = request.args.get('page', 1, type=int)
+    user = User.query.filter_by(username=username).first_or_404()
+    posts = Post.query.filter_by(author=user).order_by(Post.date_posted.desc()).paginate(per_page=3, page=page)
+    for p in posts.items:
+        p.content = p.content[:60] + '...'
+        p.content = " ".join(p.content.splitlines())
+
+    return render_template('user.html', posts=posts, user=user, title=username)
