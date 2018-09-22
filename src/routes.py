@@ -168,3 +168,13 @@ def user_profile(username):
         p.content = " ".join(p.content.splitlines())
 
     return render_template('user.html', posts=posts, user=user, title=username)
+
+@app.route("/archive")
+def sort_by_oldest():
+    posts = Post.query.all()
+    for p in posts:
+        p.content = p.content[:60] + '...'
+        p.content = " ".join(p.content.splitlines())
+
+    return render_template('posts.html', posts=posts, title='Oldest blog posts')
+    
