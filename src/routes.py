@@ -2,9 +2,11 @@ import os
 import secrets
 from flask import render_template, flash, redirect, url_for, request, abort
 from flask_login import login_user, current_user, logout_user, login_required
+from flask_mail import Message
 from PIL import Image
-from src import app, db, bcrypt
-from src.forms import SignUpForm, LoginForm, UpdateAccountForm, PostForm, ContactForm
+from src import app, db, bcrypt, mail
+from src.forms import (SignUpForm, LoginForm, UpdateAccountForm, PostForm,
+                       ContactForm, PasswordRequestResetForm, PasswordResetForm)
 from src.models import User, Post
 
 @app.route("/")
@@ -35,7 +37,7 @@ def sign_up():
         new_user = User(username=form.username.data, email=form.email.data, password=hashed_pw)
         db.session.add(new_user)
         db.session.commit()
-        flash(f'Your account was successfully created. You are now able to log in.', 'success')
+        flash('Your account was successfully created. You are now able to log in.', 'success')
         return redirect(url_for('login'))
 
     return render_template('signup.html', title='Sign Up', form=form)
@@ -95,6 +97,7 @@ def account():
         db.session.commit()
         flash('Your account information has been updated.', 'success')
         return redirect(url_for('account'))
+
     elif request.method == 'GET':
         form.username.data = current_user.username
         form.email.data = current_user.email
@@ -137,6 +140,7 @@ def edit_post(post_id):
         db.session.commit()
         flash('Your post have been updated.', 'success')
         return redirect(url_for('post', post_id=current_post.id))
+
     elif request.method == 'GET':
         form.title.data = current_post.title
         form.content.data = current_post.content
@@ -186,8 +190,57 @@ def contact():
     if form.validate_on_submit():
         flash('Your message has been sent.', 'success')
         return redirect(url_for('contact'))
+
     elif request.method == 'GET':
         if current_user.is_authenticated:
             form.email.data = current_user.email
 
     return render_template('contact.html', title='Contact', form=form)
+
+def send_pw_reset_email(user):
+    token = user.get_reset_token()
+    message = Message('YouBlog: Password Reset', sender=os.environ['SERVER_EMAIL'], recipients=[user.email])
+    message.body = f'''To reset your password, visit the following link:
+{url_for('pw_reset', token=token, _external=True)}
+
+If you did not make this request then ignore this email, no changes will be made. 
+'''
+    mail.send(message)
+
+@app.route("/request_pw_reset", methods=['GET', 'POST'])
+def request_pw_reset():
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
+
+    form = PasswordRequestResetForm()
+
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+        send_pw_reset_email(user)
+        flash(f'Instructions to reset your password have been emailed to {form.email.data}.', 'info')
+        return redirect(url_for('login'))
+
+    return render_template('request_reset.html', title='Password Recovery', form=form)
+
+
+@app.route("/pw_reset/<token>", methods=['GET', 'POST'])
+def pw_reset(token):
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
+
+    user = User.verify_reset_token(token)
+
+    if user is None:
+        flash('Expired or invalid token.', 'warning')
+        return redirect(url_for('request_pw_reset'))
+
+    form = PasswordResetForm()
+
+    if form.validate_on_submit():
+        hashed_pw = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+        user.password = hashed_pw
+        db.session.commit()
+        flash('Your password has been updated. You are now able to log in.', 'success')
+        return redirect(url_for('login'))
+
+    return render_template('pw_reset.html', title='Reset Password', form=form)

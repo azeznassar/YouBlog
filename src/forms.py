@@ -55,3 +55,18 @@ class ContactForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
     message = TextAreaField('Message', validators=[DataRequired(), Length(min=15)])
     send = SubmitField('Send')
+
+class PasswordRequestResetForm(FlaskForm):
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    submit = SubmitField('Request Password Reset')
+
+    def validate_email(self, email):
+        email_exists = User.query.filter_by(email=email.data).first()
+        if email_exists is None:
+            raise ValidationError('Email does not exist.')
+
+
+class PasswordResetForm(FlaskForm):
+    password = PasswordField('Password', validators=[DataRequired(), Length(min=4)])
+    confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
+    submit = SubmitField('Change Password')
