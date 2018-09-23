@@ -52,6 +52,7 @@ class PostForm(FlaskForm):
     submit = SubmitField('Submit')
 
 class ContactForm(FlaskForm):
+    name = StringField('Name', validators=[DataRequired(), Length(min=2, max=25)])
     email = StringField('Email', validators=[DataRequired(), Email()])
     message = TextAreaField('Message', validators=[DataRequired(), Length(min=15)])
     send = SubmitField('Send')

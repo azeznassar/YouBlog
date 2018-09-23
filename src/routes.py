@@ -182,12 +182,17 @@ def sort_by_oldest():
 
     return render_template('posts.html', posts=posts, title='Oldest blog posts')
 
+def send_contact_email(name, email, msg):
+    message = Message(f'Message from {name}', sender=email, recipients=[os.environ['SERVER_EMAIL']])
+    message.body = msg + f'\nReply email address: {email}'
+    mail.send(message)
 
 @app.route("/contact", methods=['GET', 'POST'])
 def contact():
     form = ContactForm()
 
     if form.validate_on_submit():
+        send_contact_email(form.name.data, form.email.data, form.message.data)
         flash('Your message has been sent.', 'success')
         return redirect(url_for('contact'))
 
