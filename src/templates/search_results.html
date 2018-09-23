@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+{% block content %}
+    {% for result in results %}
+        <h1>Search Results for {{ query }}</h1>
+        <article class="media content-section">
+            <img src="{{ url_for('static', filename='profile_imgs/' + result.author.image) }}" alt="Profile Picture" class="rounded-circle article-img">
+            <div class="media-body">
+                <div class="article-metadata">
+                    <a class="mr-2" href="{{ url_for('user_profile', username=result.author.username) }}">{{ result.author.username }}</a>
+                    <small class="text-muted">{{ result.date_posted.strftime('%Y-%m-%d') }}</small>
+                </div>
+                <h2><a class="article-title" href="{{ url_for('post', post_id=result.id) }}">{{ result.title }}</a></h2>
+                <p class="article-content">{{ result.content }}</p>
+            </div>
+        </article>
+    {% endfor %}
+{% endblock %}

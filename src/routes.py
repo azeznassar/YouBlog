@@ -4,9 +4,10 @@ from flask import render_template, flash, redirect, url_for, request, abort
 from flask_login import login_user, current_user, logout_user, login_required
 from flask_mail import Message
 from PIL import Image
+import flask_whooshalchemy
 from src import app, db, bcrypt, mail
 from src.forms import (SignUpForm, LoginForm, UpdateAccountForm, PostForm,
-                       ContactForm, PasswordRequestResetForm, PasswordResetForm)
+                       ContactForm, PasswordRequestResetForm, PasswordResetForm, SearchForm)
 from src.models import User, Post
 
 @app.route("/")
@@ -249,3 +250,18 @@ def pw_reset(token):
         return redirect(url_for('login'))
 
     return render_template('pw_reset.html', title='Reset Password', form=form)
+
+
+@app.route("/search", methods=['GET', 'POST'])
+def search():
+    form = SearchForm()
+
+    if form.validate_on_submit():
+        return redirect(url_for('search_results', query=form.search.data))
+
+    return render_template('search.html', title='Search', form=form)
+
+@app.route('/search_results/<query>')
+def search_results(query):
+    results = Post.query.whoosh_search(query)
+    return render_template('search_results.html', query=query, results=results)

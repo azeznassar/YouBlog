@@ -71,3 +71,8 @@ class PasswordResetForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired(), Length(min=4)])
     confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Change Password')
+
+class SearchForm(FlaskForm):
+    search = StringField('Search for blog posts', validators=[DataRequired()])
+    submit = SubmitField('Submit')
+    
