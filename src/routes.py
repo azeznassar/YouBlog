@@ -10,15 +10,17 @@ from src.forms import (SignUpForm, LoginForm, UpdateAccountForm, PostForm,
                        ContactForm, PasswordRequestResetForm, PasswordResetForm, SearchForm)
 from src.models import User, Post
 
+def make_summary(posts):
+    for p in posts:
+        p.content = p.content[:60] + '...'
+        p.content = " ".join(p.content.splitlines())
+
 @app.route("/")
 @app.route("/home")
 def home():
     page = request.args.get('page', 1, type=int)
     posts = Post.query.order_by(Post.date_posted.desc()).paginate(per_page=5, page=page)
-    for p in posts.items:
-        p.content = p.content[:60] + '...'
-        p.content = " ".join(p.content.splitlines())
-
+    make_summary(posts.items)
     return render_template('home.html', posts=posts, title='Post and share your own blogs')
 
 
@@ -264,4 +266,5 @@ def search():
 @app.route('/search_results/<query>')
 def search_results(query):
     results = Post.query.whoosh_search(query)
+    make_summary(results)
     return render_template('search_results.html', query=query, results=results)

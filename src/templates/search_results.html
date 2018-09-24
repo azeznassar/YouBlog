@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block content %}
+    <h1 class="border-bottom mb-4">Results for: {{ query }}</h1>
     {% for result in results %}
-        <h1>Search Results for {{ query }}</h1>
         <article class="media content-section">
             <img src="{{ url_for('static', filename='profile_imgs/' + result.author.image) }}" alt="Profile Picture" class="rounded-circle article-img">
             <div class="media-body">
