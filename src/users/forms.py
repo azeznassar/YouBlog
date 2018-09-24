@@ -1,8 +1,8 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
-from flask_login import current_user
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
+from flask_login import current_user
 from src.models import User
 
 class SignUpForm(FlaskForm):
@@ -46,17 +46,6 @@ class UpdateAccountForm(FlaskForm):
             if email_exists:
                 raise ValidationError('Email already exists.')
 
-class PostForm(FlaskForm):
-    title = StringField('Title', validators=[DataRequired(), Length(min=5)])
-    content = TextAreaField('Content', validators=[DataRequired(), Length(min=20)])
-    submit = SubmitField('Submit')
-
-class ContactForm(FlaskForm):
-    name = StringField('Name', validators=[DataRequired(), Length(min=2, max=25)])
-    email = StringField('Email', validators=[DataRequired(), Email()])
-    message = TextAreaField('Message', validators=[DataRequired(), Length(min=15)])
-    send = SubmitField('Send')
-
 class PasswordRequestResetForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
     submit = SubmitField('Request Password Reset')
@@ -71,8 +60,4 @@ class PasswordResetForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired(), Length(min=4)])
     confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Change Password')
-
-class SearchForm(FlaskForm):
-    search = StringField('Search for blog posts', validators=[DataRequired()])
-    submit = SubmitField('Submit')
     
