@@ -21,9 +21,11 @@ from src.users.routes import users
 from src.main.routes import main
 from src.contact.routes import contact
 from src.search.routes import search
+from src.errors.error_handlers import errors
 
 app.register_blueprint(posts)
 app.register_blueprint(users)
 app.register_blueprint(main)
 app.register_blueprint(contact)
 app.register_blueprint(search)
+app.register_blueprint(errors)

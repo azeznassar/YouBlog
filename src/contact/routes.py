@@ -18,5 +18,5 @@ def contact_form():
         if current_user.is_authenticated:
             form.email.data = current_user.email
 
-    return render_template('contact.html', title='Contact', form=form)
+    return render_template('contact/contact.html', title='Contact', form=form)
     

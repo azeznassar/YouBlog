@@ -18,12 +18,12 @@ def submit_post():
         flash('Your blog post has been submitted', 'success')
         return redirect(url_for('main.home'))
 
-    return render_template('submit.html', title='Submit a post', legend='Submit a blog post', form=form)
+    return render_template('posts/submit.html', title='Submit a post', legend='Submit a blog post', form=form)
 
 @posts.route("/post/<int:post_id>")
 def post(post_id):
     current_post = Post.query.get_or_404(post_id)
-    return render_template('post.html', title=current_post.title, post=current_post)
+    return render_template('posts/post.html', title=current_post.title, post=current_post)
 
 @posts.route("/post/<int:post_id>/edit", methods=['GET', 'POST'])
 @login_required
@@ -46,7 +46,7 @@ def edit_post(post_id):
         form.title.data = current_post.title
         form.content.data = current_post.content
 
-    return render_template('submit.html', title='Edit post', legend='Edit your blog post', form=form)
+    return render_template('posts/submit.html', title='Edit post', legend='Edit your blog post', form=form)
 
 
 @posts.route("/post/<int:post_id>/delete", methods=['POST'])

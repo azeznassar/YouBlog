@@ -12,10 +12,10 @@ def search_form():
     if form.validate_on_submit():
         return redirect(url_for('search.search_results', query=form.search.data))
 
-    return render_template('search.html', title='Search', form=form)
+    return render_template('search/search.html', title='Search', form=form)
 
 @search.route('/search_results/<query>')
 def search_results(query):
     results = Post.query.whoosh_search(query)
     make_summary(results)
-    return render_template('search_results.html', query=query, results=results)
+    return render_template('search/search_results.html', query=query, results=results)

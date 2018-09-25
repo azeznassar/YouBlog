@@ -23,7 +23,7 @@ def sign_up():
         flash('Your account was successfully created. You are now able to log in.', 'success')
         return redirect(url_for('users.login'))
 
-    return render_template('signup.html', title='Sign Up', form=form)
+    return render_template('users/signup.html', title='Sign Up', form=form)
 
 
 @users.route("/login", methods=['GET', 'POST'])
@@ -42,7 +42,7 @@ def login():
         else:
             flash('Login failed. Verify that you have entered your credentials correctly.', 'danger')
 
-    return render_template('login.html', title='Login', form=form)
+    return render_template('users/login.html', title='Login', form=form)
 
 @users.route("/logout")
 def logout():
@@ -73,7 +73,7 @@ def account():
         form.email.data = current_user.email
 
     image = url_for('static', filename=f'profile_imgs/{current_user.image}')
-    return render_template('account.html', title='Your Account', image=image, form=form)
+    return render_template('users/account.html', title='Your Account', image=image, form=form)
 
 #Username in URL: remove spaces for - or disable spaces and add Display Name.
 @users.route("/user/<string:username>")
@@ -82,7 +82,7 @@ def user_profile(username):
     user = User.query.filter_by(username=username).first_or_404()
     posts = Post.query.filter_by(author=user).order_by(Post.date_posted.desc()).paginate(per_page=3, page=page)
     make_summary(posts.items)
-    return render_template('user.html', posts=posts, user=user, title=username)
+    return render_template('users/user.html', posts=posts, user=user, title=username)
 
 @users.route("/request_pw_reset", methods=['GET', 'POST'])
 def request_pw_reset():
@@ -97,7 +97,7 @@ def request_pw_reset():
         flash(f'Instructions to reset your password have been emailed to {form.email.data}.', 'info')
         return redirect(url_for('users.login'))
 
-    return render_template('request_reset.html', title='Password Recovery', form=form)
+    return render_template('users/request_reset.html', title='Password Recovery', form=form)
 
 
 @users.route("/pw_reset/<token>", methods=['GET', 'POST'])
@@ -120,4 +120,4 @@ def pw_reset(token):
         flash('Your password has been updated. You are now able to log in.', 'success')
         return redirect(url_for('users.login'))
 
-    return render_template('pw_reset.html', title='Reset Password', form=form)
+    return render_template('users/pw_reset.html', title='Reset Password', form=form)
