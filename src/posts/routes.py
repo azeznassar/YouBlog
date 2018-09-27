@@ -1,8 +1,8 @@
 from flask import render_template, url_for, flash, abort, redirect, request, Blueprint
 from flask_login import current_user, login_required
 from src import db
-from src.models import Post
-from src.posts.forms import PostForm
+from src.models import Post, Comment
+from src.posts.forms import PostForm, CommentForm
 
 posts = Blueprint('posts', __name__)
 
@@ -20,10 +20,22 @@ def submit_post():
 
     return render_template('posts/submit.html', title='Submit a post', legend='Submit a blog post', form=form)
 
-@posts.route("/post/<int:post_id>")
+@posts.route("/post/<int:post_id>", methods=['GET', 'POST'])
 def post(post_id):
     current_post = Post.query.get_or_404(post_id)
-    return render_template('posts/post.html', title=current_post.title, post=current_post)
+    form = CommentForm()
+    #page = request.args.get('commentsPage', 1, type=int)
+    comments = Comment.query.filter(Comment.post_id == post_id).order_by(Comment.date_posted.desc()).all()
+
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            new_comment = Comment(body=form.body.data, post_id=post_id, author=current_user)
+            db.session.add(new_comment)
+            db.session.commit()
+            flash('Your comment has been submitted', 'success')
+            return redirect(url_for('posts.post', post_id=post_id))
+
+    return render_template('posts/post.html', title=current_post.title, post=current_post, form=form, comments=comments)
 
 @posts.route("/post/<int:post_id>/edit", methods=['GET', 'POST'])
 @login_required
