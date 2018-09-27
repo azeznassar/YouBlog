@@ -1,2 +1,6 @@
 __pycache__/
 node_modules/
+# Database stuff
+*.sqlite3
+db.sqlite3
+*.db
