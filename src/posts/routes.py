@@ -28,12 +28,16 @@ def post(post_id):
     comments = Comment.query.filter(Comment.post_id == post_id).order_by(Comment.date_posted.desc()).all()
 
     if request.method == 'POST':
-        if form.validate_on_submit():
-            new_comment = Comment(body=form.body.data, post_id=post_id, author=current_user)
-            db.session.add(new_comment)
-            db.session.commit()
-            flash('Your comment has been submitted', 'success')
-            return redirect(url_for('posts.post', post_id=post_id))
+        if current_user.is_authenticated:
+            if form.validate_on_submit():
+                new_comment = Comment(body=form.body.data, post_id=post_id, author=current_user)
+                db.session.add(new_comment)
+                db.session.commit()
+                flash('Your comment has been submitted', 'success')
+                return redirect(url_for('posts.post', post_id=post_id))
+        else:
+            flash('You need to be logged in to submit a comment.', 'warning')
+            return redirect(url_for('users.login'))
 
     return render_template('posts/post.html', title=current_post.title, post=current_post, form=form, comments=comments)
 
@@ -71,6 +75,20 @@ def delete_post(post_id):
 
     db.session.delete(current_post)
     db.session.commit()
-    flash('Your post have been deleted.', 'success')
+    flash('Your post has been deleted.', 'success')
     return redirect(url_for('main.home'))
+
+@posts.route("/delete_comment/<int:comment_id>/", methods=['POST'])
+@login_required
+def delete_comment(comment_id):
+    current_comment = Comment.query.get_or_404(comment_id)
+    post_id = current_comment.post_id
+
+    if current_comment.author != current_user:
+        abort(403)
+
+    db.session.delete(current_comment)
+    db.session.commit()
+    flash('Your comment has been deleted.', 'success')
+    return redirect(url_for('posts.post', post_id=post_id))
     
